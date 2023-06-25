@@ -1,0 +1,10 @@
+go 1.20
+
+use (
+	./hello
+	./learn
+	./learn/c4：面向对象/queue
+	./learn/c4：面向对象/tree
+	./learn/c5：面向接口/retriever/mock
+	./learn/c5：面向接口/retriever/real
+)

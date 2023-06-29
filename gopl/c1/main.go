@@ -8,11 +8,14 @@ import (
 	"image/gif"
 	"io"
 	"io/ioutil"
+	"log"
 	"math"
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -164,10 +167,15 @@ func main() {
 	// lissajous(create)
 
 	// fetch()
-	fetchAll()
+	// fetchAll()
+	// testGoroutine()
+	// server1()
+	// server2()
+	// server3()
+	lissajousServer()
 }
 
-func lissajous(out io.Writer) {
+func lissajous(out io.Writer, cycles int) {
 	// var palette = []color.Color{color.White, color.Black}
 	var palette = []color.Color{color.Opaque,
 		color.RGBA{
@@ -186,7 +194,7 @@ func lissajous(out io.Writer) {
 	)
 
 	const (
-		cycles  = 5
+		// cycles  = 5
 		res     = 0.001
 		size    = 100
 		nframes = 64
@@ -203,7 +211,7 @@ func lissajous(out io.Writer) {
 		rect := image.Rect(0, 0, 2*size+1, 2*size+1)
 		img := image.NewPaletted(rect, palette)
 
-		for t := 0.0; t < cycles*2*math.Pi; t += res {
+		for t := 0.0; t < float64(cycles)*2*math.Pi; t += res {
 			x := math.Sin(t)
 			y := math.Sin(t*freq + phase)
 			img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5), uint8(blackIndex))
@@ -252,7 +260,6 @@ func fetch() {
 }
 
 func fetchAll() {
-
 	start := time.Now()
 	ch := make(chan string)
 
@@ -264,26 +271,137 @@ func fetchAll() {
 		fmt.Println(<-ch) // receive from channel ch
 	}
 
-	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
+	// sets := <-ch
+	// fmt.Println(sets)/
 
+	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
 }
 
 func fetchN(url string, ch chan<- string) {
 	start := time.Now()
 
-	resp, err := http.Get(url)
-	if err != nil {
-		ch <- fmt.Sprint(err) // send to channel ch
-		return
-	}
+	// resp, err := http.Get(url)
+	resp, _ := http.Get(url)
+	// if err != nil {
+	// 	ch <- fmt.Sprint(err) // send to channel ch
+	// 	return
+	// }
 
-	nbytes, err := io.Copy(ioutil.Discard, resp.Body)
+	// 创建文件
+	utl_file_name := url + strconv.Itoa(1) + ".txt"
+	file, _ := os.Create(utl_file_name)
+
+	// nbytes, _ := io.Copy(ioutil.Discard, resp.Body)
+	nbytes, _ := io.Copy(file, resp.Body)
 	resp.Body.Close() // don't leak resource
-	if err != nil {
-		ch <- fmt.Sprintf("while reading %s: %v", url, err)
-		return
-	}
+	// if err != nil {
+	// 	ch <- fmt.Sprintf("while reading %s: %v", url, err)
+	// 	return
+	// }
 
 	secs := time.Since(start).Seconds()
 	ch <- fmt.Sprintf("%.2fs %7d %s", secs, nbytes, url)
+	// stop
+
+	fmt.Println("rest operations")
+}
+
+func testGoroutine() {
+	ch := make(chan string)
+
+	for _, url := range os.Args[1:] {
+		go fetchN(url, ch)
+	}
+
+	for range os.Args[1:] {
+		fmt.Println("just print")
+		fmt.Println(<-ch) // receive from channel ch
+	}
+
+	fmt.Println("end")
+}
+
+func server1() {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
+	}
+
+	http.HandleFunc("/", handler)
+	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
+
+func server2() {
+	var mu sync.Mutex
+	var count int
+
+	// handler echoes the Path component of the requested URL
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		count++
+		mu.Unlock()
+		fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
+	}
+
+	// counter echoes the number of calls so far
+	counter := func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		fmt.Fprintf(w, "Count: %d\n", count)
+		mu.Unlock()
+	}
+
+	http.HandleFunc("/", handler)
+	http.HandleFunc("/count", counter)
+	log.Fatal(http.ListenAndServe("localhost:8008", nil))
+}
+
+func server3() {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%s %s %s\n", r.Method, r.URL, r.Proto)
+
+		for k, v := range r.Header {
+			fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
+		}
+
+		fmt.Fprintf(w, "Host = %q\n", r.Host)
+		fmt.Fprintf(w, "RemoteAddr = %q\n", r.RemoteAddr)
+
+		if err := r.ParseForm(); err != nil {
+			log.Print(err)
+		}
+
+		for k, v := range r.Form {
+			fmt.Fprintf(w, "Form[%q] = %q\n", k, v)
+		}
+	}
+
+	http.HandleFunc("/server3", handler)
+	log.Fatal(http.ListenAndServe("localhost:8009", nil))
+}
+
+func lissajousServer() {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Query", r.URL.Query())
+		fmt.Println("Query cycles", r.URL.Query()["cycles"])
+		cycles, err := strconv.Atoi(r.URL.Query()["cycles"][0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "cycles: %v\n", err)
+		}
+
+		lissajous(w, cycles)
+	}
+
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":8080", nil)
+}
+
+func brief() {
+	// 命名类型 === （ts）类型别名
+
+	// 指针
+	//：&，对变量操作，返回内存地址，类型为*int
+	//：*，对指针操作，返回值
+
+	// 方法和接口
+
+	// 包（package）
 }

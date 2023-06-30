@@ -1,6 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"popcount"
+	"strconv"
+	"tempconv"
+	"weightconv"
+)
 
 func names() {
 	// 关键字
@@ -26,13 +34,27 @@ func names() {
 	// var、const、type、func
 
 	// new()
+
+	// 作用域
+	//：声明语句的作用域对应的是一个源代码的文本区域；它是一个编译时属性
+	//：一个变量的生命周期是指程序运行时变量存在的有效时间段，在此时间区域内它可以被程序的其他部分引用；是一个运行时概念。
+	//：句法块/（隐式）词法块/全局词法块
+	// for/if/switch/...
+	// 包级语法域：在包的源文件之间共享
 }
 
 var globalA *int
 var globalB *int
 
 func main() {
-	testPointer()
+	// testPointer()
+
+	// fmt.Printf("Brrrr! %v\n", tempconv.AbsoluteZeroC)
+	// fmt.Println(tempconv.CToF(tempconv.BoilingC))
+
+	// cf()
+	// gpo()
+	fmt.Println(popcount.PopCount(256))
 }
 
 func testPointer() {
@@ -62,28 +84,39 @@ func fib(n int) int {
 	return x
 }
 
-type Celsius float64
-type Fahrenheit float64
+func cf() {
+	for _, arg := range os.Args[1:] {
+		t, err := strconv.ParseFloat(arg, 64)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "cf: %v\n", err)
+			os.Exit(1)
+		}
 
-const (
-	AbsoluteZeroC Celsius = -273.15
-	FreezingC     Celsius = 0
-	BoilingC      Celsius = 100
-)
-
-func CToF(c Celsius) Fahrenheit {
-	// 类型转换，而非函数调用
-	// 对每一个类型T，都有对应的类型转换操作T(x)
-	// 只有两个类型的底层基础类型相同时才能进行
-	// 数值/字符串/特定类型的slice也可以进行转换
-	return Fahrenheit(c*9/5 + 32)
+		f := tempconv.Fahrenheit(t)
+		c := tempconv.Celsius(t)
+		fmt.Printf("%s = %s, %s = %s\n", f, tempconv.FToC(f), c, tempconv.CToF(c))
+	}
 }
 
-func FToC(f Fahrenheit) Celsius {
-	return Celsius((f - 32) * 5 / 9)
-}
+func gpo() {
+	args := os.Args[1:]
+	if len(args) == 0 {
+		input := bufio.NewScanner(os.Stdin)
+		for input.Scan() {
+			args = append(args, input.Text())
+		}
+	}
 
-// 方法定义
-func (c Celsius) String() string {
-	return fmt.Sprintf("%g°C", c)
+	for _, arg := range args {
+		w, err := strconv.ParseFloat(arg, 64)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "cf: %v\n", err)
+			os.Exit(1)
+		}
+
+		g := weightconv.Gram(w)
+		p := weightconv.Pound(w)
+		o := weightconv.Ounce(w)
+		fmt.Printf("%s = %s, %s = %s,%s = %s\n", g, weightconv.GToP(g), p, weightconv.PToO(p), o, weightconv.OToP(o))
+	}
 }

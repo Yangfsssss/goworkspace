@@ -7,4 +7,9 @@ use (
 	./learn/c4：面向对象/tree
 	./learn/c5：面向接口/retriever/mock
 	./learn/c5：面向接口/retriever/real
+
+
+  ./gopl/c2/tempconv
+  ./gopl/c2/weightconv
+  ./gopl/c2/popcount
 )

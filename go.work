@@ -1,15 +1,15 @@
 go 1.20
 
 use (
+	./gopl/c2/popcount
+	./gopl/c2/tempconv
+	./gopl/c2/weightconv
+
 	./hello
 	./learn
 	./learn/c4：面向对象/queue
 	./learn/c4：面向对象/tree
 	./learn/c5：面向接口/retriever/mock
 	./learn/c5：面向接口/retriever/real
-
-
-  ./gopl/c2/tempconv
-  ./gopl/c2/weightconv
-  ./gopl/c2/popcount
+	./learn/c6：函数式编程/functional/adder
 )

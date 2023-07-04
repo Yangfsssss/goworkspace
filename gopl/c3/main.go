@@ -82,7 +82,16 @@ func main() {
 	// strings()
 	// packages()
 	// fmt.Println(intsToString([]int{1, 2, 3}))
-	fmt.Println(notReComma("234235353412"))
+	// fmt.Println(notRecursiveComma("9234235353412"))
+	// fmt.Println(floatNegativeComma("98234235353412"))
+	// fmt.Println(floatNegativeComma("-9123456789.321"))
+	// fmt.Println(isMixedTwoStrings("9234235353412", "5392353412423"))
+	// fmt.Println(isMixedTwoStrings("12344445555", "12344455555"))
+	// fmt.Println(isMixedTwoStrings("你你你你234他他他他", "2你你你你3他他他他4"))
+	// fmt.Println(isMixedTwoStrings("你你你你234他他他他", "2你你你你3他他他4"))
+	// strNumberTransform()
+	// consts()
+	untypedConsts()
 }
 
 const (
@@ -405,7 +414,7 @@ func intsToString(values []int) string {
 	return buf.String()
 }
 
-func notReComma(s string) string {
+func notRecursiveComma(s string) string {
 	var buf bytes.Buffer
 	for i := 0; i < len(s); i++ {
 		if i > 0 && (len(s)-i)%3 == 0 {
@@ -416,4 +425,179 @@ func notReComma(s string) string {
 	}
 
 	return buf.String()
+}
+
+func floatNegativeComma(s string) string {
+	var prefix string
+	var suffix string
+
+	if strings.HasPrefix(s, "-") {
+		prefix = "-"
+		s = s[1:]
+	}
+
+	dotIndex := strings.LastIndex(s, ".")
+	if dotIndex != -1 {
+		suffix = s[dotIndex:]
+		s = s[:dotIndex]
+	}
+
+	return prefix + notRecursiveComma(s) + suffix
+}
+
+func isMixedTwoStrings(s1, s2 string) bool {
+	l1, l2 := len(s1), len(s2)
+	if l1 != l2 {
+		return false
+	}
+
+	// 123444445555
+	// 123444455555
+
+	m1 := make(map[rune]int)
+	m2 := make(map[rune]int)
+
+	for _, v := range s1 {
+		m1[v]++
+	}
+	for _, v := range s2 {
+		m2[v]++
+	}
+
+	// fmt.Println(m1)
+	// fmt.Println(m2)
+
+	result := true
+	for k := range m1 {
+		if m1[k] != m2[k] {
+			result = false
+		}
+	}
+
+	return result
+}
+
+func strNumberTransform() {
+	// int to string
+	x := 123
+	y := fmt.Sprintf("%d", x)
+	fmt.Println(y, strconv.Itoa(x))
+
+	// 用不同进制格式化数字
+	fmt.Println(strconv.FormatInt(int64(x), 2))
+
+	// 将字符串解析为整数
+	m, err := strconv.Atoi("456")
+	if err != nil {
+		fmt.Println("err")
+	}
+	fmt.Println(m)
+	n, err := strconv.ParseInt("456", 10, 64)
+	fmt.Println(n)
+
+	// 解析无符号整数
+	p, err := strconv.ParseUint("67893", 10, 64)
+	fmt.Println(p)
+
+	// fmt.Scanf()
+}
+
+func consts() {
+	// iota常量生成器
+	type Weekday int
+	const (
+		Sunday Weekday = iota
+		Monday
+		Tuesday
+		Wednesday
+		Thursday
+		Friday
+		Saturday
+	)
+
+	type Flags uint
+	const (
+		FlagUp = 1 << iota
+		FlagBroadcast
+		FlagLoopback
+		FlagPointToPoint
+		FlagMulticast
+	)
+
+	IsUp := func(v Flags) bool {
+		return v&FlagUp == FlagUp
+	}
+
+	TurnDown := func(v *Flags) {
+		*v &^= FlagUp
+	}
+
+	SetBroadcast := func(v *Flags) {
+		*v |= FlagBroadcast
+	}
+
+	IsCast := func(v Flags) bool {
+		return v&(FlagBroadcast|FlagMulticast) != 0
+	}
+
+	var v Flags = FlagMulticast | FlagUp
+	fmt.Printf("%b %t\n", v, IsUp(v))
+	TurnDown(&v)
+	fmt.Printf("%b %t\n", v, IsUp(v))
+	SetBroadcast(&v)
+	fmt.Printf("%b %t\n", v, IsUp(v))
+	fmt.Printf("%b %t\n", v, IsCast(v))
+
+	const (
+		_ = 1 << (10 * iota)
+		KiB
+		MiB
+		GiB
+		TiB
+		PiB
+		EiB
+		ZiB
+		YiB
+	)
+}
+
+func untypedConsts() {
+	// 编译器为没有明确基础类型的数字常量提供比基础类型更高精度的算术运算，至少256bit
+	// 可以直接用于更多的表达式而不需要显式的类型转换
+	// 无类型的常量：布尔：true/整数：0/字符：\u0000/浮点数：0.0/复数：oi/字符串："abc"
+
+	// var x float32 = math.Pi
+	// var y float64 = math.Pi
+	// var z complex128 = math.Pi
+
+	// 精度不同
+	const Pi64 float64 = math.Pi
+	var x float32 = float32(Pi64)       // 3.1415927
+	var y float64 = Pi64                // 3.141592653589793
+	var z complex128 = complex128(Pi64) // (3.141592653589793+0i)
+	fmt.Println(x, y, z)
+
+	// 除法运算符/会根据操作数的类型生成对应类型的结果。
+	// 因此，不同写法的常量除法表达式可能对应不同的结果
+	var f float64 = 212
+	fmt.Println((f - 32) * 5 / 9)     // 100
+	fmt.Println(5 / 9 * (f - 32))     // 0
+	fmt.Println(5.0 / 9.0 * (f - 32)) // 100
+
+	// 赋值时发生隐式类型转换
+	var r float64 = 3 + 0i
+	fmt.Println(r)
+	r = 2
+	fmt.Println(r)
+	r = 1e123
+	fmt.Println(r)
+	f = 'a' // 单引号代表取码点操作
+	fmt.Println(f)
+
+	// 没有显式类型的变量声明，常量的形式将隐式决定变量的默认类型
+	i := 0      // implicit int(0) 内存大小不确定
+	q := '\000' // implicit rune('\000')
+	m := 0.0    // implicit float64(0.0) 固定float64
+	n := 0i     // implicit complex128(0i) // 固定complex128
+	fmt.Println(i, q, m, n)
 }

@@ -1,26 +1,9 @@
 package main
 
-import "fmt"
-
-func main() {
-	// slices()
-	// a := [...]int{0, 1, 2, 3, 4, 5}
-	// reserve(a[:])
-	// fmt.Println(a)
-
-	// makeSlices()
-
-	// tryAppend()
-	// tryAppendInt()
-
-	// tryNonempty()
-
-	// tryRemove()
-
-	// tryTrialReverse()
-	// tryTrialRotate()
-	tryRemoveSameStr()
-}
+import (
+	"fmt"
+	"unicode"
+)
 
 func slices() {
 	months := [...]string{
@@ -68,6 +51,8 @@ func slices() {
 		ptr      *int
 		len, cap int
 	}
+
+	// 类型转换rune()/string()/[]byte()
 }
 
 func reserve(s []int) {
@@ -174,8 +159,8 @@ func stackOperations() {
 }
 
 func removeSequence(slice []string, i int) []string {
-	fmt.Println(slice[i:])
-	fmt.Println(slice[i+1:])
+	// fmt.Println(slice[i:])
+	// fmt.Println(slice[i+1:])
 
 	copy(slice[i:], slice[i+1:])
 	return slice[:len(slice)-1]
@@ -221,21 +206,78 @@ func tryTrialRotate() {
 }
 
 func removeSameStr(s []string) []string {
-	r := s[:]
-	for i, j := 0, 1; j <= len(r); {
-		if r[i] == r[j] {
-			r = removeSequence(r, j)
-			fmt.Println(r)
+	for i, j := 0, 1; j < len(s); {
+		if s[i] == s[j] {
+			s = removeSequence(s, j)
+			fmt.Printf("i = %d\tj = %d\tr = %s\n", i, j, s)
 		} else {
+			i++
 			j++
 		}
-		i++
 	}
 
-	return r
+	return s
 }
 
 func tryRemoveSameStr() {
-	s := [...]string{"a", "b", "b", "c", "c", "d"}
-	fmt.Println(removeSameStr(s[:]))
+	s := []string{"a", "b", "b", "c", "c", "d", "d", "e", "e", "f", "f", "g"}
+	fmt.Println(removeSameStr(s))
+}
+
+func mergeSpace(s []byte) []byte {
+	removeSequence := func(s []byte, j int) []byte {
+		copy(s[j:], s[j+1:])
+		return s[:len(s)-1]
+	}
+
+	for i, j := 0, 1; j < len(s); {
+		if unicode.IsSpace(rune(s[i])) && unicode.IsSpace(rune(s[j])) {
+			s = removeSequence(s, j)
+			fmt.Printf("i = %d\tj = %d\tr = %s\n", i, j, s)
+		} else {
+			i++
+			j++
+		}
+	}
+	return s
+}
+
+func tryMergeSpace() {
+	byte := []byte("aafdigneigu  \n\t   fjidfiefh  jsdifj frewf      ")
+	fmt.Println(string(mergeSpace(byte)))
+}
+
+func byteReverse(s []byte) []byte {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+
+	return s
+}
+
+func tryByteReverse() {
+	byte := []byte("aafdigneigu  \n\t   fjidfiefh  jsdifj frewf      ")
+	fmt.Println(string(byteReverse(byte)))
+}
+
+func main() {
+	// slices()
+	// a := [...]int{0, 1, 2, 3, 4, 5}
+	// reserve(a[:])
+	// fmt.Println(a)
+
+	// makeSlices()
+
+	// tryAppend()
+	// tryAppendInt()
+
+	// tryNonempty()
+
+	// tryRemove()
+
+	// tryTrialReverse()
+	// tryTrialRotate()
+	// tryRemoveSameStr()
+	// tryMergeSpace()
+	tryByteReverse()
 }

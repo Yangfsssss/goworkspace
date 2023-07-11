@@ -147,6 +147,36 @@ func testMap(anyMap map[string]int) {
 	anyMap["q"] = 999
 }
 
+func testGet() {
+	url := "https://xxx.com"
+	method := "GET"
+
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	// Send the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(string(body))
+}
+
 func main() {
 	// 1.2
 	// s:= echo1()
@@ -172,7 +202,8 @@ func main() {
 	// server1()
 	// server2()
 	// server3()
-	lissajousServer()
+	// lissajousServer()
+	testGet()
 }
 
 func lissajous(out io.Writer, cycles int) {

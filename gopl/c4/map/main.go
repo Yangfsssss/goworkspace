@@ -117,7 +117,7 @@ func sliceKey() {
 func charCount() {
 	counts := make(map[rune]int)
 	var utflen [utf8.UTFMax + 1]int
-	invaild := 0
+	invalid := 0
 
 	in := bufio.NewReader(os.Stdin)
 	for {
@@ -130,7 +130,7 @@ func charCount() {
 			os.Exit(1)
 		}
 		if r == unicode.ReplacementChar && n == 1 {
-			invaild++
+			invalid++
 			continue
 		}
 
@@ -151,8 +151,98 @@ func charCount() {
 		}
 	}
 
-	if invaild > 0 {
-		fmt.Printf("\n%d invalid UTF-8 characters\n", invaild)
+	if invalid > 0 {
+		fmt.Printf("\n%d invalid UTF-8 characters\n", invalid)
+	}
+}
+
+func graph() {
+	var graph = make(map[string]map[string]bool)
+
+	addEdge := func(from, to string) {
+		edges := graph[from]
+		if edges == nil {
+			edges = make(map[string]bool)
+			graph[from] = edges
+		}
+
+		edges[to] = true
+	}
+
+	hasEdge := func(from, to string) bool {
+		return graph[from][to]
+	}
+
+	addEdge("a", "b")
+	addEdge("a", "c")
+	fmt.Println(graph)
+	fmt.Println(hasEdge("a", "c"))
+	fmt.Println(hasEdge("d", "c"))
+	fmt.Println(hasEdge("d", "c"))
+}
+
+func newCharCount() {
+	counts := map[string]int{
+		"字母": 0,
+		"数字": 0,
+		"汉字": 0,
+	}
+
+	invalid := 0
+
+	in := bufio.NewReader(os.Stdin)
+
+	for {
+		r, n, err := in.ReadRune()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "newCharCount: %v\n", err)
+			os.Exit(1)
+		}
+
+		if r == unicode.ReplacementChar && n == 1 {
+			invalid++
+			continue
+		}
+
+		switch {
+		case unicode.IsLetter(r) && !unicode.Is(unicode.Han, r):
+			counts["字母"]++
+		case unicode.Is(unicode.Han, r):
+			counts["汉字"]++
+		case unicode.IsDigit(r):
+			counts["数字"]++
+		}
+	}
+
+	fmt.Printf("type\tcount\n")
+
+	for c, n := range counts {
+		fmt.Printf("%q\t%d\n", c, n)
+	}
+
+	if invalid > 0 {
+		fmt.Printf("\n%d invalid UTF-8 characters\n", invalid)
+	}
+}
+
+func wordFreq() {
+	counts := make(map[string]int)
+	// invalid := 0
+
+	in := bufio.NewScanner(os.Stdin)
+	in.Split(bufio.ScanWords)
+	for in.Scan() {
+		counts[in.Text()]++
+	}
+
+	fmt.Printf("word\tcount\n")
+
+	for c, n := range counts {
+		fmt.Printf("%q\t%d\n", c, n)
 	}
 }
 
@@ -160,5 +250,9 @@ func main() {
 	// sortMap()
 	// dedup()
 	// sliceKey()
-	charCount()
+	// charCount()
+	// graph()
+
+	// newCharCount()
+	wordFreq()
 }

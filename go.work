@@ -4,6 +4,7 @@ use (
 	./gopl/c2/popcount
 	./gopl/c2/tempconv
 	./gopl/c2/weightconv
+	./gopl/c4/JSON/github
 
 	./hello
 	./learn

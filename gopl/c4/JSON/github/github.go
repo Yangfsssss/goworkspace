@@ -17,13 +17,18 @@ type IssuesSearchResult struct {
 }
 
 type Issue struct {
-	Number   int
-	HTMLURL  string `json:"html_url"`
-	Title    string
-	State    string
-	User     *User
-	CreateAt time.Time `json:"created_at"`
-	Body     string
+	Number    int
+	HTMLURL   string `json:"html_url"`
+	Milestone *Milestone
+	Title     string
+	State     string
+	User      *User
+	CreateAt  time.Time `json:"created_at"`
+	Body      string
+}
+
+type Milestone struct {
+	Title string
 }
 
 type User struct {
@@ -32,16 +37,12 @@ type User struct {
 }
 
 func SearchIssues(terms []string) (*IssuesSearchResult, error) {
-	fmt.Println("terms", terms)
 	q := url.QueryEscape(strings.Join(terms, " "))
-	fmt.Println("q", q)
 
 	resp, err := http.Get(IssuesURL + "?q=" + q)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("resp", resp)
 
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {

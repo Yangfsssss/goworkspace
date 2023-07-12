@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github"
 	"log"
+	"omdb"
 	"os"
 	"time"
+	"xkcd"
 )
 
 func JSON() {
@@ -71,7 +73,7 @@ func getIssues() {
 		log.Fatal(err)
 	}
 
-	timeMap := make(map[string][]github.Issue)
+	timeMap := make(map[string][]github.Issue, 3)
 
 	for _, issue := range result.Items {
 		timeMap[compareTime(issue.CreateAt)] = append(timeMap[compareTime(issue.CreateAt)], *issue)
@@ -98,7 +100,20 @@ func getIssues() {
 	// }
 }
 
+func getMoviePosterByTitle() {
+	omdb.DownLoadPoster(os.Args[1:])
+
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// fmt.Println(result.Poster)
+}
+
 func main() {
 	// JSON()
-	getIssues()
+	// getIssues()
+	// getMoviePosterByTitle()
+	// xkcd.GenerateOfflineComicIndex()
+	xkcd.SearchComic(os.Args[1:])
 }

@@ -5,8 +5,10 @@ use (
 	./gopl/c2/tempconv
 	./gopl/c2/weightconv
 	./gopl/c4/JSON/github
+	./gopl/c4/JSON/omdb
+	./gopl/c4/JSON/xkcd
+	./gopl/c4/text-and-html-template/github-info
 
-	./hello
 	./learn
 	./learn/c4：面向对象/queue
 	./learn/c4：面向对象/tree

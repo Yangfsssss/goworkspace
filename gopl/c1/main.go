@@ -196,14 +196,14 @@ func main() {
 	// create, _ := os.Create("out.gif")
 	// lissajous(create)
 
-	// fetch()
+	fetch()
 	// fetchAll()
 	// testGoroutine()
 	// server1()
 	// server2()
 	// server3()
 	// lissajousServer()
-	testGet()
+	// testGet()
 }
 
 func lissajous(out io.Writer, cycles int) {
@@ -258,8 +258,8 @@ func lissajous(out io.Writer, cycles int) {
 
 func fetch() {
 	for _, url := range os.Args[1:] {
-		if !strings.HasPrefix(url, "http://") {
-			url = "http://" + url
+		if !strings.HasPrefix(url, "https://") {
+			url = "https://" + url
 		}
 
 		fmt.Println(url)
@@ -270,22 +270,15 @@ func fetch() {
 			os.Exit(resp.StatusCode)
 		}
 
-		// b, err := ioutil.ReadAll(resp.Body)
-		_, err = io.Copy(os.Stdout, resp.Body)
+		b, err := ioutil.ReadAll(resp.Body)
+		// _, err = io.Copy(os.Stdout, resp.Body)
 		resp.Body.Close()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "fetch: reading %s: %v\n", url, err)
 			os.Exit(1)
 		}
 
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "fetch: reading %s: %v\n", url, err)
-			os.Exit(1)
-		}
-
-		fmt.Println("Status Code", resp.Status)
-
-		// fmt.Printf("%s", b)
+		fmt.Printf("%s", b)
 
 	}
 }

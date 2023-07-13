@@ -28,7 +28,8 @@ type Issue struct {
 }
 
 type Milestone struct {
-	Title string
+	Title   string
+	Node_id string
 }
 
 type User struct {
@@ -53,6 +54,7 @@ func SearchIssues(terms []string) (*IssuesSearchResult, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
 	}
+	// if Issue.Milestone.Title == nil {}
 
 	return &result, nil
 }

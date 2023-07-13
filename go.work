@@ -8,8 +8,8 @@ use (
 	./gopl/c4/JSON/omdb
 	./gopl/c4/JSON/xkcd
 	./gopl/c4/text-and-html-template/github-info
+	./gopl/c5/recur
 
-	./hello
 	./learn/c4：面向对象/queue
 	./learn/c4：面向对象/tree
 	./learn/c5：面向接口/retriever/mock

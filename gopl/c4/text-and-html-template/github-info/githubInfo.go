@@ -12,14 +12,16 @@ var infoList = template.Must(template.New("infoList").Parse(`
 <h1>{{.TotalCount}} Github Info</h1>
 <table>
 <tr style='text-align: left'>
-	<th>#</th>
+	<th>Number</th>
 	<th>Bug report</th>
 	<th>Milestone</th>
 	<th>Userinfo</th>
 </tr>
 {{range .Items}}
 <tr>
+	<td><a href='{{.HTMLURL}}'>{{.Number}}</a></td>
 	<td><a href='{{.HTMLURL}}'>{{.Title}}</a></td>
+	// <td><a href='{{.HTMLURL}}'>{{.Milestone.Title || ""}}</a></td>
 	<td><a href='{{.User.HTMLURL}}'>{{.User.Login}}</a></td>
 </tr>
 {{end}}
@@ -28,6 +30,8 @@ var infoList = template.Must(template.New("infoList").Parse(`
 
 func GetGithubInfo() {
 	result, err := github.SearchIssues(os.Args[1:])
+
+	fmt.Println(result)
 
 	if err != nil {
 		log.Fatal(err)

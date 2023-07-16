@@ -16,5 +16,7 @@ use (
 	./learn/c5：面向接口/retriever/real
 	./learn/c6：函数式编程/functional/adder
 	./learn/c6：函数式编程/functional/fib
+	./learn/c7：错误处理和资源管理/filelistingserver
 	./learn/c7：错误处理和资源管理/filelistingserver/filelisting
+	./learn/c8：测试与性能调优
 )

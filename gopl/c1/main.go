@@ -258,8 +258,8 @@ func lissajous(out io.Writer, cycles int) {
 
 func fetch() {
 	for _, url := range os.Args[1:] {
-		if !strings.HasPrefix(url, "https://") {
-			url = "https://" + url
+		if !strings.HasPrefix(url, "http://") {
+			url = "http://" + url
 		}
 
 		fmt.Println(url)

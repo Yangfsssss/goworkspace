@@ -30,6 +30,9 @@ const (
 )
 
 func visit(links []string, n *html.Node) []string {
+	fmt.Println("n = ", n.Data)
+	fmt.Println("links = ", links)
+
 	if n.Type == html.ElementNode && n.Data == "a" {
 		for _, a := range n.Attr {
 			if a.Key == "href" {
@@ -37,6 +40,11 @@ func visit(links []string, n *html.Node) []string {
 			}
 		}
 	}
+
+	// c := n.FirstChild
+	// if c != nil {
+	// 	links = visit(links, c)
+	// }
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		links = visit(links, c)
@@ -53,6 +61,8 @@ func findLinks() {
 	}
 
 	links := visit(nil, doc)
+	// links := recursiveVisit([]string{}, doc.FirstChild)
+	// links := recordSameElementInHtml(doc)
 	fmt.Println(links)
 	// outline(links, doc)
 }
@@ -66,6 +76,43 @@ func findLinks() {
 // 		outline(stack, c)
 // 	}
 // }
+
+func recursiveVisit(stack []string, n *html.Node) []string {
+	if n == nil {
+		return stack
+	}
+
+	fmt.Println("n = ", n.Data)
+	fmt.Println("stack = ", stack)
+
+	fmt.Println(n.Type == html.ElementNode)
+
+	if n.Type == html.ElementNode {
+		stack = append(stack, n.Data)
+	}
+
+	if n.FirstChild == nil {
+		return recursiveVisit(stack, n.NextSibling)
+	}
+
+	return recursiveVisit(stack, n.FirstChild)
+}
+
+func recordSameElementInHtml(n *html.Node) map[string]int {
+	counts := make(map[string]int)
+
+	for _, e := range n.Data {
+		if counts[string(e)] == 0 {
+			counts[string(e)] = 1
+		} else {
+			counts[string(e)]++
+		}
+	}
+
+	fmt.Printf("%v\n", counts)
+
+	return counts
+}
 
 func main() {
 	findLinks()

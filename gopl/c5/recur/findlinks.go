@@ -1,4 +1,4 @@
-package main
+package recur
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ const (
 	DoctypeNode
 )
 
-func visit(links []string, n *html.Node) []string {
+func Visit(links []string, n *html.Node) []string {
 	fmt.Println("n = ", n.Data)
 	fmt.Println("links = ", links)
 
@@ -47,20 +47,20 @@ func visit(links []string, n *html.Node) []string {
 	// }
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		links = visit(links, c)
+		links = Visit(links, c)
 	}
 
 	return links
 }
 
-func findLinks() {
+func FindLinks() {
 	doc, err := html.Parse(os.Stdin)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "findLinks: %v\n", err)
 		os.Exit(1)
 	}
 
-	links := visit(nil, doc)
+	links := Visit(nil, doc)
 	// links := recursiveVisit([]string{}, doc.FirstChild)
 	// links := recordSameElementInHtml(doc)
 	fmt.Println(links)
@@ -77,7 +77,7 @@ func findLinks() {
 // 	}
 // }
 
-func recursiveVisit(stack []string, n *html.Node) []string {
+func RecursiveVisit(stack []string, n *html.Node) []string {
 	if n == nil {
 		return stack
 	}
@@ -92,13 +92,13 @@ func recursiveVisit(stack []string, n *html.Node) []string {
 	}
 
 	if n.FirstChild == nil {
-		return recursiveVisit(stack, n.NextSibling)
+		return RecursiveVisit(stack, n.NextSibling)
 	}
 
-	return recursiveVisit(stack, n.FirstChild)
+	return RecursiveVisit(stack, n.FirstChild)
 }
 
-func recordSameElementInHtml(n *html.Node) map[string]int {
+func RecordSameElementInHtml(n *html.Node) map[string]int {
 	counts := make(map[string]int)
 
 	for _, e := range n.Data {
@@ -114,6 +114,6 @@ func recordSameElementInHtml(n *html.Node) map[string]int {
 	return counts
 }
 
-func main() {
-	findLinks()
-}
+// func main() {
+// 	FindLinks()
+// }

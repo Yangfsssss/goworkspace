@@ -1,6 +1,7 @@
 go 1.20
 
 use (
+	"./gopl/c6/6.5：示例: Bit数组"
 	./gopl/c2/popcount
 	./gopl/c2/tempconv
 	./gopl/c2/weightconv
@@ -8,7 +9,9 @@ use (
 	./gopl/c4/JSON/omdb
 	./gopl/c4/JSON/xkcd
 	./gopl/c4/text-and-html-template/github-info
+	./gopl/c5/5.5：函数值
 	./gopl/c5/recur
+	./gopl/c6/6.1：方法声明
 
 	./learn/c4：面向对象/queue
 	./learn/c4：面向对象/tree
@@ -21,6 +24,6 @@ use (
 	./learn/c8：测试与性能调优
 	./learn/crawler
 	./learn/crawler/engine
-	./learn/crawler/zhenai/parser
 	./learn/crawler/model
+	./learn/crawler/zhenai/parser
 )

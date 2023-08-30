@@ -12,6 +12,8 @@ use (
 	./gopl/c5/5.5：函数值
 	./gopl/c5/recur
 	./gopl/c6/6.1：方法声明
+	./gopl/c7/7.2：接口类型/bytecounter
+	./gopl/c7/7.4：flag.Value接口/tempconv
 
 	./learn/c4：面向对象/queue
 	./learn/c4：面向对象/tree

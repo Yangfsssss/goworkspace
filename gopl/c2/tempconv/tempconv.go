@@ -15,7 +15,9 @@ const (
 
 // 方法定义
 func (c Celsius) String() string {
-	return fmt.Sprintf("%g°C", c)
+	fmt.Println("String")
+
+	return fmt.Sprintf("%g°99", c)
 }
 
 func (f Fahrenheit) String() string {

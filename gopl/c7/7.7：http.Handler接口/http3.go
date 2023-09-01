@@ -12,7 +12,7 @@ type database map[string]dollars
 
 func (db database) list(w http.ResponseWriter, req *http.Request) {
 	for item, price := range db {
-		fmt.Fprintf(w, "%s: %s\n", item, price)
+		fmt.Fprintf(w, "%s: %f\n", item, price)
 	}
 }
 
@@ -25,7 +25,7 @@ func (db database) price(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "%s\n", price)
+	fmt.Fprintf(w, "%f\n", price)
 }
 
 func main() {

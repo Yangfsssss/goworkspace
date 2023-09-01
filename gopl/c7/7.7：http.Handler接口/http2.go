@@ -13,7 +13,7 @@ func (db database) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.URL.Path {
 	case "/list":
 		for item, price := range db {
-			fmt.Fprintf(w, "%s: %s\n", item, price)
+			fmt.Fprintf(w, "%s: %f\n", item, price)
 		}
 	case "/price":
 		item := req.URL.Query().Get("item")
@@ -24,7 +24,7 @@ func (db database) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		fmt.Fprintf(w, "%s\n", price)
+		fmt.Fprintf(w, "%f\n", price)
 	default:
 		w.WriteHeader(http.StatusNotFound) // 404
 		fmt.Fprintf(w, "no such page: %s\n", req.URL)

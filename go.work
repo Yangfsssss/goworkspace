@@ -2,6 +2,7 @@ go 1.20
 
 use (
 	"./gopl/c6/6.5：示例: Bit数组"
+	"./gopl/c7/7.9：示例：表达式求值/eval"
 	./gopl/c2/popcount
 	./gopl/c2/tempconv
 	./gopl/c2/weightconv

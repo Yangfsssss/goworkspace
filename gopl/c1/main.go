@@ -1,4 +1,4 @@
-package main
+package c1fetch
 
 import (
 	"bufio"
@@ -196,7 +196,7 @@ func main() {
 	// create, _ := os.Create("out.gif")
 	// lissajous(create)
 
-	fetch()
+	// fetch()
 	// fetchAll()
 	// testGoroutine()
 	// server1()
@@ -256,8 +256,24 @@ func lissajous(out io.Writer, cycles int) {
 	gif.EncodeAll(out, &anim)
 }
 
-func fetch() {
-	for _, url := range os.Args[1:] {
+func SingleFetch(url string) ([]byte, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	output, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return output, nil
+}
+
+func Fetch() map[string][]byte {
+	result := make(map[string][]byte)
+	for _, url := range os.Args[1:2] {
 		if !strings.HasPrefix(url, "http://") {
 			url = "http://" + url
 		}
@@ -270,7 +286,7 @@ func fetch() {
 			os.Exit(resp.StatusCode)
 		}
 
-		b, err := ioutil.ReadAll(resp.Body)
+		b, err := io.ReadAll(resp.Body)
 		// _, err = io.Copy(os.Stdout, resp.Body)
 		resp.Body.Close()
 		if err != nil {
@@ -278,9 +294,12 @@ func fetch() {
 			os.Exit(1)
 		}
 
-		fmt.Printf("%s", b)
+		// fmt.Printf("%s", b)
 
+		result[url] = b
 	}
+
+	return result
 }
 
 func fetchAll() {

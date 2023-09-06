@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -41,9 +42,18 @@ func clockWall() {
 
 	fmt.Println("timezoneAndPortsMap", timezoneAndPortsMap)
 
+	var wg sync.WaitGroup
+
 	for zone, port := range timezoneAndPortsMap {
-		listen(zone, port)
+		wg.Add(1)
+		// 为了传递循环变量的值给 listen 函数，以避免循环变量的副作用对并发执行的影响。
+		go func(zone string, port int) {
+			defer wg.Done()
+			listen(zone, port)
+		}(zone, port)
 	}
+
+	wg.Wait()
 }
 
 func listen(zone string, port int) {
@@ -52,6 +62,8 @@ func listen(zone string, port int) {
 		log.Fatal(err)
 	}
 
+	fmt.Println(zone + " is listening on port " + strconv.Itoa(port))
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -59,7 +71,9 @@ func listen(zone string, port int) {
 			continue
 		}
 
-		go handleConn(conn, zone, port)
+		handleConn(conn, zone, port)
+
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
@@ -67,10 +81,12 @@ func handleConn(c net.Conn, zone string, port int) {
 	defer c.Close()
 
 	for {
-		_, err := io.WriteString(c, generateCurrentTimeByTimezone(zone))
+		_, err := io.WriteString(c, fmt.Sprintf("%-10s | %s\n", zone, generateCurrentTimeByTimezone(zone)))
 		if err != nil {
 			return // e.g. client disconnected
 		}
+
+		time.Sleep(1 * time.Second)
 	}
 }
 

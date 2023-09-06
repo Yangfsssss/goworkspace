@@ -8,13 +8,14 @@ import (
 )
 
 func main() {
-	conn, err := net.Dial("tcp", "localhost:8010")
+	conn, err := net.Dial("tcp", "localhost:8000")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer conn.Close()
-	mustCopy(os.Stdout, conn)
+	go mustCopy(os.Stdout, conn)
+	mustCopy(conn, os.Stdin)
 }
 
 func mustCopy(dst io.Writer, src io.Reader) {

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
+	"time"
 )
 
 func main() {
@@ -13,9 +15,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	defer fmt.Println("conn closed")
 	defer conn.Close()
 	go mustCopy(os.Stdout, conn)
 	mustCopy(conn, os.Stdin)
+
+	time.Sleep(1 * time.Second)
 }
 
 func mustCopy(dst io.Writer, src io.Reader) {

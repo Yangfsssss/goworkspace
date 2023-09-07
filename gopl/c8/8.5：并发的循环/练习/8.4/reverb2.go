@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -31,15 +32,27 @@ func listen() {
 }
 
 func handleConn(c net.Conn) {
+	defer c.Close()
+	var wg sync.WaitGroup
+
 	input := bufio.NewScanner(c)
 	for input.Scan() {
-		go echo(c, input.Text(), 2*time.Second)
+		wg.Add(1)
+		go echo(c, input.Text(), 2*time.Second, &wg)
 	}
 
-	c.Close()
+	go func() {
+		wg.Wait()
+		if c, ok := c.(*net.TCPConn); ok {
+			c.CloseWrite()
+		}
+	}()
+
+	// c.Close()
 }
 
-func echo(c net.Conn, shout string, delay time.Duration) {
+func echo(c net.Conn, shout string, delay time.Duration, wg *sync.WaitGroup) {
+	defer wg.Done()
 	fmt.Fprintln(c, "\t", strings.ToUpper(shout))
 	time.Sleep(delay)
 	fmt.Fprintln(c, "\t", shout)

@@ -20,7 +20,7 @@ func main() {
 	tick := time.Tick(100 * time.Microsecond)
 	for countdown := 1000; countdown > 0; countdown-- {
 		fmt.Println(countdown)
-		// 如果没有default，则会阻塞，直到处理了某个case
+		// 非阻塞select，有default分支，没有值就绪时不阻塞
 		select {
 		case <-tick:
 			fmt.Println("tick calling")

@@ -29,6 +29,8 @@ func main() {
 		done <- struct{}{}
 	}()
 
+	// 阻塞select，直到某个分支被执行
+	// 然后main结束
 	select {
 	case <-abort:
 		fmt.Println("Launch aborted!")

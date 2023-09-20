@@ -27,7 +27,7 @@ func listen() {
 			continue
 		}
 
-		handleConn(conn)
+		handleConn2(conn)
 	}
 }
 
@@ -51,6 +51,49 @@ func handleConn(c net.Conn) {
 		return
 	case <-keep:
 		fmt.Println("Connection kept!")
+	}
+}
+
+func handleConn2(c net.Conn) {
+	// 设置超时时间为 10 秒
+	timeout := 10 * time.Second
+
+	// 创建一个计时器，用于超时检测
+	timer := time.NewTimer(timeout)
+
+	// 创建一个通道，用于接收客户端的输入
+	input := make(chan string)
+
+	// 启动一个 goroutine 读取客户端的输入并发送到 input 通道中
+	go func() {
+		scanner := bufio.NewScanner(c)
+		for scanner.Scan() {
+			input <- scanner.Text()
+		}
+	}()
+
+	for {
+		select {
+		case msg := <-input:
+			// 如果收到客户端的输入，重置计时器
+			if !timer.Stop() {
+				<-timer.C
+			}
+			timer.Reset(timeout)
+
+			// 处理客户端的输入
+			fmt.Println("Received:", msg)
+			go echo(c, msg, 2*time.Second)
+
+			// 回复客户端
+			fmt.Fprintln(c, msg)
+
+		case <-timer.C:
+			// 超时，断开连接
+			fmt.Println("Connection timed out")
+			c.Close()
+			return
+		}
 	}
 }
 

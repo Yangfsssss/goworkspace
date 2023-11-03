@@ -7,29 +7,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 )
 
-// 包示例：path/filepath
-// 拼接路径
-// path := filepath.Join("dir", "subdir", "file.txt")
-// fmt.Println(path) // 输出: dir/subdir/file.txt
-
-// // 分割路径
-// dir, file := filepath.Split(path)
-// fmt.Println("目录:", dir) // 输出: dir/subdir/
-// fmt.Println("文件名:", file) // 输出: file.txt
-
-// // 获取目录部分
-// dir = filepath.Dir(path)
-// fmt.Println("目录:", dir) // 输出: dir/subdir
-
-// // 获取文件名部分
-// file = filepath.Base(path)
-// fmt.Println("文件名:", file) // 输出: file.txt
-
-// // 获取文件扩展名
-// ext := filepath.Ext(file)
-// fmt.Println("扩展名:", ext) // 输出: .txt
+var verbose = flag.Bool("v", false, "show verbose progress messages")
 
 func main() {
 	flag.Parse()
@@ -44,14 +25,30 @@ func main() {
 		for _, root := range roots {
 			walkDir(root, fileSizes)
 		}
+
 		close(fileSizes)
 	}()
 
-	// Print the results.
+	var tick <-chan time.Time
+	if *verbose {
+		tick = time.Tick(500 * time.Millisecond)
+	}
+
 	var nfiles, nbytes int64
-	for size := range fileSizes {
-		nfiles++
-		nbytes += size
+	// 通常在 select 语句中使用 break 只会跳出 select 语句本身，而不会跳出包含 select 语句的循环。
+	// 但是通过使用标签和 break loop，可以实现跳出外部循环的效果。
+loop:
+	for {
+		select {
+		case size, ok := <-fileSizes:
+			if !ok {
+				break loop
+			}
+			nfiles++
+			nbytes += size
+		case <-tick:
+			printDiskUsage(nfiles, nbytes)
+		}
 	}
 
 	printDiskUsage(nfiles, nbytes)
